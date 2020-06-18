@@ -7,6 +7,10 @@ const addExercise = (data) => {
     UserQuery.findOne({ _id: data.userId })
       .then((user) => {
         const { description, duration, date } = data;
+        const dateObj = new Date(date);
+        if (isNaN(dateObj.getTime())) {
+          reject(new Error());
+        }
         const exercise = new ExerciseQuery({ description, duration, date });
         exercise.save((err, savedData) => {
           if (err) reject(err);
@@ -28,7 +32,6 @@ const addExercise = (data) => {
 };
 
 const getLog = (userId, from, to, limit) => {
-  console.log(userId);
   return new Promise((resolve, reject) => {
     UserQuery.findOne({ _id: userId })
       .populate('log')
@@ -42,8 +45,6 @@ const getLog = (userId, from, to, limit) => {
           reject(new Error(filterREsult));
         }
         if (!!limit) {
-          console.log('df');
-
           let buf = [...exercise];
           const maxShow = limit <= exercise.length ? limit : exercise.length;
           exercise = buf.slice(0, maxShow);
