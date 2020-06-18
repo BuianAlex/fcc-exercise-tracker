@@ -25,6 +25,7 @@ const user = require('./users/service');
 const exercise = require('./exercise/service');
 
 app.use(express.static('public'));
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
@@ -73,6 +74,15 @@ app.get('/api/exercise/log', (req, res, next) => {
   } else {
     res.status(400).send('Unknown userId');
   }
+});
+
+app.get('/api/exercise/users', (req, res, next) => {
+  user
+    .getAllUsers()
+    .then((users) => {
+      res.send(users);
+    })
+    .catch(next);
 });
 
 // Not found middleware
