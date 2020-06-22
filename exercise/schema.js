@@ -7,7 +7,10 @@ const ExercisesSchema = new Schema({
     required: true,
   },
   duration: Number,
-  date: Date,
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 module.exports = mongoose.model('exercises', ExercisesSchema);

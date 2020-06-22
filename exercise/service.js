@@ -1,3 +1,4 @@
+const moment = require('moment');
 const ExerciseQuery = require('./schema');
 const UserQuery = require('../users/userScheme');
 const timeFilter = require('../utils/timeFilter');
@@ -6,28 +7,33 @@ const addExercise = (data) => {
   return new Promise((resolve, reject) => {
     UserQuery.findOne({ _id: data.userId })
       .then((user) => {
-        const { description, duration, date } = data;
+        let { description, duration, date } = data;
         const dateObj = new Date(date);
         if (isNaN(dateObj.getTime())) {
-          reject(new Error());
+          date = moment().format('YYYY-MM-DD');
         }
         const exercise = new ExerciseQuery({ description, duration, date });
         exercise.save((err, savedData) => {
           if (err) reject(err);
           user.log.push(savedData._id);
+
           user.save((err, userSaved) => {
             if (err) reject(err);
             resolve({
-              userId: userSaved._id,
-              description: savedData.description,
-              duration: savedData.duration,
-              date: savedData.date,
+              _id: userSaved._id,
               username: userSaved.username,
+              date: moment(savedData.date).format('ddd MMM DD YYYY'),
+              duration: savedData.duration,
+              description: savedData.description,
             });
           });
         });
       })
-      .catch(reject);
+      .catch((err) => {
+        console.log('re');
+
+        reject(new Error());
+      });
   });
 };
 
